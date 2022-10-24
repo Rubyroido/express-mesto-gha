@@ -37,7 +37,7 @@ const getUsers = (req, res) => {
 
 const updateProfile = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true }).orFail(new Error('NotFound'))
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true }).orFail(new Error('NotFound'))
     .then((user) => {
       return res.send(user);
     })
