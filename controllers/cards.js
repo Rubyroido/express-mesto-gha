@@ -12,7 +12,7 @@ const createCard = (req, res) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner })
-    .then((card) => { res.send({ data: card }); })
+    .then((card) => { res.send(card); })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE).send({ message: 'Введены неверные данные' });
@@ -50,13 +50,13 @@ const likeCard = (req, res) => {
   )
     .then((card) => {
       if (card) {
-        res.send({ data: card });
+        res.send(card);
       } else {
         res.status(NOT_FOUND).send({ message: 'Неверный id карточки' });
       }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(ERROR_CODE).send({ message: 'Введены неверные данные' });
       } else {
         res.status(DEFAULT_ERROR).send({ message: 'Нет ответа от сервера' });
@@ -70,12 +70,16 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true }
   )
-    .then((card) => { res.send({ data: card }); })
+    .then((card) => {
+      if (card) {
+        res.send(card);
+      } else {
+        res.status(NOT_FOUND).send({ message: 'Неверный id карточки' });
+      }
+    })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(ERROR_CODE).send({ message: 'Введены неверные данные' });
-      } else if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
       } else {
         res.status(DEFAULT_ERROR).send({ message: 'Нет ответа от сервера' });
       }
