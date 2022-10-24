@@ -3,7 +3,7 @@ const { ERROR_CODE, NOT_FOUND, DEFAULT_ERROR } = require('../errors');
 
 const getCards = (req, res) => {
   Card.find({})
-    .then((cards) => { res.send({ data: cards }); })
+    .then((cards) => { res.send(cards); })
     .catch(() => { res.status(DEFAULT_ERROR).send({ message: 'Нет ответа от сервера' }); });
 };
 
@@ -48,12 +48,16 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true }
   )
-    .then((card) => { res.send({ data: card }); })
+    .then((card) => {
+      if (card) {
+        res.send({ data: card });
+      } else {
+        res.status(NOT_FOUND).send({ message: 'Неверный id карточки' });
+      }
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_CODE).send({ message: 'Введены неверные данные' });
-      } else if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
       } else {
         res.status(DEFAULT_ERROR).send({ message: 'Нет ответа от сервера' });
       }
