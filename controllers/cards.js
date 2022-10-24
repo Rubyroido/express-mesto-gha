@@ -25,17 +25,18 @@ const createCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  const cardId = req.params;
-
-  Card.findById(cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
-      card.remove();
+      if (card) {
+        card.remove();
+        res.status(200).send({ message: 'карточка успешно удалена' });
+      } else {
+        res.status(NOT_FOUND).send({ message: 'Неверный id карточки' });
+      }
     })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'CastError') {
         res.status(ERROR_CODE).send({ message: 'Введены неверные данные' });
-      } else if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
       } else {
         res.status(DEFAULT_ERROR).send({ message: 'Нет ответа от сервера' });
       }
