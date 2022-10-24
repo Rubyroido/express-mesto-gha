@@ -20,10 +20,13 @@ const getUser = (req, res) => {
       return res.send(user);
     })
     .catch((err) => {
-      if (err.message === 'NotFound' || err.name === 'CastError') {
+      if (err.message === 'NotFound') {
         return res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
       }
-      return res.status(ERROR_CODE).send({ message: 'Некорректный запрос' });
+      if (err.name === 'CastError') {
+        return res.status(ERROR_CODE).send({ message: 'Некорректный запрос' });
+      }
+      return res.status(DEFAULT_ERROR).send({ message: 'Нет ответа от сервера' });
     });
 };
 
