@@ -37,16 +37,18 @@ const getUsers = (req, res) => {
 
 const updateProfile = (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.params.userId, { name, about })
-    .then((user) => { res.send(user); })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true }).orFail(new Error('NotFound'))
+    .then((user) => {
+      return res.send(user);
+    })
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE).send({ message: 'Введены неверные данные' });
-      } else if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
-      } else {
-        res.status(DEFAULT_ERROR).send({ message: 'Нет ответа от сервера' });
+      if (err.message === 'NotFound') {
+        return res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
       }
+      if (err.name === 'ValidationError') {
+        return res.status(ERROR_CODE).send({ message: 'Введены неверные данные' });
+      }
+      return res.status(DEFAULT_ERROR).send({ message: 'Нет ответа от сервера' });
     });
 };
 
