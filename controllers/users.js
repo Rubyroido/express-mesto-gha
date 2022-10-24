@@ -17,16 +17,18 @@ const createUser = (req, res) => {
 };
 
 const getUser = (req, res) => {
-  User.findById(req.params.id)
-    .then((user) => { res.send(user); })
+  User.findById(req.params.userId).orFail(new Error('NotFound'))
+    .then((user) => {
+      return res.send(user);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_CODE).send({ message: 'Введены неверные данные' });
-      } else if (err.name === 'CastError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
-      } else {
-        res.status(DEFAULT_ERROR).send({ message: 'Нет ответа от сервера' });
+        return res.status(ERROR_CODE).send({ message: 'Введены неверные данные' });
       }
+      if (err.message === 'NotFound') {
+        return res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
+      }
+      return res.status(DEFAULT_ERROR).send({ message: 'Нет ответа от сервера' });
     });
 };
 
