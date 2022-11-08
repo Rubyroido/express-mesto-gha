@@ -36,7 +36,7 @@ const login = (req, res, next) => {
   User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'secret-key', { expiresIn: '7d' });
-      res.send(token);
+      res.send({ token });
     })
     .catch(() => {
       return next(new UnauthorizedError('Ошибка при авторизации'));
