@@ -16,7 +16,7 @@ const createCard = (req, res, next) => {
   Card.create({ name, link, owner })
     .then((card) => { res.send(card); })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         return next(new BadRequestError('Некорректный запрос'));
       }
       return next(err);
