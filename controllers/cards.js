@@ -31,7 +31,7 @@ const deleteCard = (req, res, next) => {
     throw new NotFoundError('Неверный id карточки');
   })
     .then((card) => {
-      if (JSON.stringify(card.owner) === req.user._id) {
+      if (card.owner.toString() === req.user._id) {
         card.remove();
         res.status(200).send({ message: 'карточка успешно удалена' });
       } else {
