@@ -20,14 +20,14 @@ app.use(bodyParser.json());
 app.post('/signup', validateCreateUser, createUser);
 app.post('/signin', validateLogin, login);
 
+app.use((req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
+});
+
 app.use(auth);
 
 app.use('/', userRouter);
 app.use('/', cardsRouter);
-
-app.use('*', (req, res, next) => {
-  next(NotFoundError('Страница не найдена'));
-});
 
 app.use(errors());
 
