@@ -27,11 +27,10 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  Card.findById(req.params.cardId)
+  Card.findById(req.params.cardId).orFail(() => {
+    throw new NotFoundError('Неверный id карточки');
+  })
     .then((card) => {
-      if (!card) {
-        throw new NotFoundError('Неверный id карточки');
-      }
       if (JSON.stringify(card.owner) === req.user._id) {
         card.remove();
         res.status(200).send({ message: 'карточка успешно удалена' });
