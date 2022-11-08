@@ -48,14 +48,11 @@ const login = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  User.findById(req.params.userId).orFail(new Error('NotFound'))
+  User.findById(req.params.userId).orFail(new NotFoundError('Пользователь не найден'))
     .then((user) => {
       return res.send(user);
     })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        return next(new NotFoundError('Пользователь не найден'));
-      }
       if (err.name === 'CastError') {
         return next(new BadRequestError('Некорректный запрос'));
       }
